@@ -42,7 +42,7 @@ class ExpeditionCommandeTest {
     @Test
     @Transactional
     //  note : @Transactional ici, car on veut tester les modifications faites par le service sur les entités
-    void lesQuantitesSontMisesAJour() {
+    void lesQuantitesSontMisesAJour() throws Exception {
         var commande = daoCommande.findById(NUMERO_COMMANDE_PAS_LIVREE).orElseThrow();
         assertNull(commande.getEnvoyeele(), "Cette commande n'a pas encore été envoyée");
 

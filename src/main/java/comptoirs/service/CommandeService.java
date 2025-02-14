@@ -105,9 +105,16 @@ public class CommandeService {
      *                                                         pas positive
      */
     @Transactional
-    public Ligne ajouterLigne(int commandeNum, int produitRef, @Positive int quantite) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+    public Ligne ajouterLigne(int commandeNum, int produitRef, @Positive int quantite) throws Exception {
+        var commande = commandeDao.findById((Integer) commandeNum).orElseThrow();
+        var produit = produitDao.findById((Integer)produitRef).orElseThrow();
+        if(produit.isIndisponible() || commande.getEnvoyeele() != null || produit.getUnitesEnStock() < quantite) {
+        	throw new IllegalStateException();
+        }
+        produit.setUnitesCommandees(produit.getUnitesCommandees() + quantite);
+        Ligne nouvelleLigne = new Ligne(commande, produit, (Integer)quantite);
+        ligneDao.save(nouvelleLigne);
+        return nouvelleLigne;
     }
 
     /**
@@ -129,8 +136,17 @@ public class CommandeService {
      * @throws IllegalStateException            si la commande a déjà été envoyée
      */
     @Transactional
-    public Commande enregistreExpedition(int commandeNum) {
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+    public Commande enregistreExpedition(int commandeNum) throws Exception {
+        var commande = commandeDao.findById((Integer)commandeNum).orElseThrow();
+        if(commande.getEnvoyeele() != null) {
+            throw new IllegalStateException();
+        }
+        commande.setEnvoyeele(LocalDate.now());
+        for(Ligne ligne : commande.getLignes()){
+            var produit = ligne.getProduit();
+            produit.setUnitesEnStock(produit.getUnitesEnStock() - ligne.getQuantite());
+            produit.setUnitesCommandees(produit.getUnitesCommandees() - ligne.getQuantite());
+        }
+        return commande;
     }
 }

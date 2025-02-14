@@ -29,13 +29,13 @@ class AjoutLigneTest {
     ProduitRepository daoProduit;
 
     @Test
-    void onPeutAjouterDesLignesSiPasLivre() {
+    void onPeutAjouterDesLignesSiPasLivre() throws Exception {
         var ligne = service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_DISPONIBLE_1, 1);
         assertNotNull(ligne.getId(), "La ligne doit être enregistrée, sa clé générée");
     }
 
     @Test
-    void ajouterDesLignesIncrementeLaQuantiteCommandee() {
+    void ajouterDesLignesIncrementeLaQuantiteCommandee() throws Exception {
         var produit = daoProduit.findById(REFERENCE_PRODUIT_DISPONIBLE_2).orElseThrow();
         var quantiteAvant = produit.getUnitesCommandees();
         var ligne = service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_DISPONIBLE_2, 1);
